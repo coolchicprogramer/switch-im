@@ -1,20 +1,29 @@
-﻿// switch-im.cpp : このファイルには 'main' 関数が含まれています。プログラム実行の開始と終了がそこで行われます。
-//
+﻿#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <windows.h>
 
-#include <iostream>
-
-int main()
+int
+main(int argc, char** argv)
 {
-    std::cout << "Hello World!\n";
+  constexpr LPARAM IMC_GETOPENSTATUS = 5;
+  constexpr LPARAM IMC_SETOPENSTATUS = 6;
+
+  auto hwnd = GetForegroundWindow();
+  if (!hwnd)
+    return 0;
+
+  auto ime = ImmGetDefaultIMEWnd(hwnd);
+  if (!ime)
+    return 0;
+
+  LPARAM stat;
+  if (argc < 2) {
+    stat = SendMessage(ime, WM_IME_CONTROL, IMC_GETOPENSTATUS, 0);
+    std::cout << stat << "\n";
+  } else {
+    stat = std::atoi(argv[1]);
+    SendMessage(ime, WM_IME_CONTROL, IMC_SETOPENSTATUS, stat);
+  }
+  return 0;
 }
-
-// プログラムの実行: Ctrl + F5 または [デバッグ] > [デバッグなしで開始] メニュー
-// プログラムのデバッグ: F5 または [デバッグ] > [デバッグの開始] メニュー
-
-// 作業を開始するためのヒント: 
-//    1. ソリューション エクスプローラー ウィンドウを使用してファイルを追加/管理します 
-//   2. チーム エクスプローラー ウィンドウを使用してソース管理に接続します
-//   3. 出力ウィンドウを使用して、ビルド出力とその他のメッセージを表示します
-//   4. エラー一覧ウィンドウを使用してエラーを表示します
-//   5. [プロジェクト] > [新しい項目の追加] と移動して新しいコード ファイルを作成するか、[プロジェクト] > [既存の項目の追加] と移動して既存のコード ファイルをプロジェクトに追加します
-//   6. 後ほどこのプロジェクトを再び開く場合、[ファイル] > [開く] > [プロジェクト] と移動して .sln ファイルを選択します
